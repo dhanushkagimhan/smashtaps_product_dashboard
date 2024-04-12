@@ -1,10 +1,17 @@
 import { useState } from "react";
 import { SelectCategoryBox, SelectProductBox } from "./components";
 import { Button } from "@mui/material";
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
+import { ProductType } from "../types";
 
 export default function ProductDashboard() {
+  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [products, setProducts] = useState<ProductType[]>([]);
+  const [showColumnChart, setShowColumnChart] = useState<boolean>(false);
+  const [disableReportBtn, setDesableReportBtn] = useState<boolean>(true);
 
   const runReport = () => {
     console.log(selectedProducts);
@@ -13,6 +20,32 @@ export default function ProductDashboard() {
   const clearBtn = () => {
     setSelectedCategory("");
     setSelectedProducts([]);
+  };
+
+  const getPieChartData = () => {
+    const tempData: { name: string; y: number }[] = [];
+
+    const dataValue = 100 / categories.length;
+
+    categories.forEach((element) => {
+      tempData.push({ name: element, y: dataValue });
+    });
+
+    return tempData;
+  };
+
+  const pieChartoptions = {
+    chart: {
+      type: "pie",
+    },
+    title: {
+      text: "All Categories",
+    },
+    series: [
+      {
+        data: getPieChartData(),
+      },
+    ],
   };
 
   return (
@@ -28,6 +61,8 @@ export default function ProductDashboard() {
           <div className="mt-10">
             <SelectCategoryBox
               selectedCategory={selectedCategory}
+              categories={categories}
+              setCategories={setCategories}
               setSelectedCategory={setSelectedCategory}
             />
           </div>
@@ -35,6 +70,8 @@ export default function ProductDashboard() {
             <SelectProductBox
               selectedCategory={selectedCategory}
               selectedProducts={selectedProducts}
+              products={products}
+              setProducts={setProducts}
               setSelectedProducts={setSelectedProducts}
             />
           </div>
@@ -43,13 +80,24 @@ export default function ProductDashboard() {
             <Button
               variant="contained"
               onClick={() => runReport()}
-              disabled={selectedCategory === ""}
+              disabled={disableReportBtn}
             >
               Contained
             </Button>
           </div>
         </div>
-        <div className="col-span-3"></div>
+        <div className="col-span-3">
+          <div className="mt-[100px]">
+            {showColumnChart ? (
+              <></>
+            ) : (
+              <HighchartsReact
+                highcharts={Highcharts}
+                options={pieChartoptions}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

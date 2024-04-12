@@ -1,21 +1,21 @@
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 type SelectCategoryBoxProps = {
   selectedCategory: string;
+  categories: string[];
+  setCategories: (category: string[]) => void;
   setSelectedCategory: (category: string) => void;
 };
 
 export default function SelectCategoryBox(props: SelectCategoryBoxProps) {
-  const [categories, setCategories] = useState<string[]>([]);
-
   useEffect(() => {
     axios
       .get("https://dummyjson.com/products/categories")
       .then((data) => {
         console.log(data.data);
-        setCategories(data.data);
+        props.setCategories(data.data);
       })
       .catch((error) => {
         console.log("Error in categories load : " + error);
@@ -32,7 +32,7 @@ export default function SelectCategoryBox(props: SelectCategoryBoxProps) {
         label="Category"
         onChange={(e) => props.setSelectedCategory(e.target.value)}
       >
-        {categories.map((data, index) => {
+        {props.categories.map((data, index) => {
           return (
             <MenuItem value={data} key={index}>
               {data}

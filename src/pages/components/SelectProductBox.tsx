@@ -6,17 +6,18 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { ProductType } from "../../types";
 
 type SelectProductBoxProps = {
   selectedCategory: string;
   selectedProducts: string[];
+  products: ProductType[];
   setSelectedProducts: (products: string[]) => void;
+  setProducts: (products: ProductType[]) => void;
 };
 
 export default function SelectProductBox(props: SelectProductBoxProps) {
-  const [products, setProducts] = useState<string[]>([]);
-
   useEffect(() => {
     if (props.selectedCategory !== "") {
       axios
@@ -25,13 +26,13 @@ export default function SelectProductBox(props: SelectProductBoxProps) {
         )
         .then((data) => {
           console.log(data.data.products);
-          const tempProducts: string[] = [];
+          const tempProducts: ProductType[] = [];
 
           data.data.products.forEach((element) => {
-            tempProducts.push(element.title);
+            tempProducts.push({ title: element.title, price: element.price });
           });
 
-          setProducts(tempProducts);
+          props.setProducts(tempProducts);
         })
         .catch((error) => {
           console.log("Error in Product load : " + error);
@@ -39,7 +40,7 @@ export default function SelectProductBox(props: SelectProductBoxProps) {
     }
   }, [props.selectedCategory]);
 
-  const handleChange = (event: SelectChangeEvent<typeof products>) => {
+  const handleChange = (event: SelectChangeEvent) => {
     const {
       target: { value },
     } = event;
@@ -60,10 +61,10 @@ export default function SelectProductBox(props: SelectProductBoxProps) {
         label="Category"
         onChange={handleChange}
       >
-        {products.map((data, index) => {
+        {props.products.map((data, index) => {
           return (
-            <MenuItem value={data} key={index}>
-              {data}
+            <MenuItem value={data.title} key={index}>
+              {data.title}
             </MenuItem>
           );
         })}
