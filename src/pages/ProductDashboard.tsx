@@ -1,7 +1,7 @@
 export default function ProductDashboard() {
   return (
     <div>
-      <div></div>
+      <div>s</div>
     </div>
   );
 }
