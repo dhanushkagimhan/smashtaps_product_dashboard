@@ -25,6 +25,7 @@ export default function ProductDashboard() {
   useEffect(() => {
     console.log(disableReportBtnState.btnState);
     disableReportBtnState.setBtnState(true);
+    reportGeneratedDataState.setGeneratedCategory("");
   }, []);
 
   const setColumnChartData = () => {
