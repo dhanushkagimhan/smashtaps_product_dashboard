@@ -1,6 +1,16 @@
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from "@mui/material";
 import axios from "axios";
 import { useEffect } from "react";
+import {
+  useDisableReportBtnStore,
+  useReportGeneratedDataStore,
+} from "../../states";
 
 type SelectCategoryBoxProps = {
   selectedCategory: string;
@@ -10,6 +20,9 @@ type SelectCategoryBoxProps = {
 };
 
 export default function SelectCategoryBox(props: SelectCategoryBoxProps) {
+  const disableReportBtnState = useDisableReportBtnStore();
+  const reportGeneratedDataState = useReportGeneratedDataStore();
+
   useEffect(() => {
     axios
       .get("https://dummyjson.com/products/categories")
@@ -22,6 +35,18 @@ export default function SelectCategoryBox(props: SelectCategoryBoxProps) {
       });
   }, []);
 
+  const handleChange = (e: SelectChangeEvent) => {
+    const selectedValue: string = e.target.value;
+
+    props.setSelectedCategory(selectedValue);
+
+    if (reportGeneratedDataState.generatedCategory !== selectedValue) {
+      disableReportBtnState.setBtnState(false);
+    } else {
+      disableReportBtnState.setBtnState(true);
+    }
+  };
+
   return (
     <FormControl fullWidth>
       <InputLabel id="category-selection">Select Category</InputLabel>
@@ -30,7 +55,7 @@ export default function SelectCategoryBox(props: SelectCategoryBoxProps) {
         id="category-selection-box"
         value={props.selectedCategory}
         label="Category"
-        onChange={(e) => props.setSelectedCategory(e.target.value)}
+        onChange={handleChange}
       >
         {props.categories.map((data, index) => {
           return (
